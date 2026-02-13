@@ -4,7 +4,12 @@ on:
   push:
     branches:
       - main
-
+    tags:
+      - "v*"
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
 permissions:
   contents: read
   packages: write
@@ -24,6 +29,11 @@ jobs:
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/srinivasamanda06/skills-publish-packages/stackoverflown
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
@@ -33,3 +43,4 @@ jobs:
           tags: |
             ghcr.io/srinivasamanda06/skills-publish-packages/stackoverflown:main
             ghcr.io/srinivasamanda06/skills-publish-packages/stackoverflown:${{ github.sha }}
+            ${{ steps.meta.outputs.tags }}
